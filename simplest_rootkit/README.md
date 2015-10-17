@@ -8,7 +8,17 @@ My goal was to show some entry point that will "do something" "be really easy" a
 
 About content of this dir:
 
-Makefile - simple build whole modules using make command, for ARM also can be builded using (for my A20 board): make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+Makefile - simple build whole modules using make command, 
+
+For x86 Specify KDIR variable in Make file in example:
+
+    KDIR := /usr/src/linux-headers-3.13.0-XX-generic/
+
+then make command should work as well
+
+For ARM also can be builded using make with ARCH and CROSS_COMPILE parameters (i.e. for my A20 board): 
+
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
 
 rootkitmod.c - simple kernel module that delete themself from modules list names after loading (it is invisible for lsmod)    
 rootkitmod_time.c  - using simple timer in kernel module
