@@ -1,4 +1,4 @@
-KDIR := /home/hjacker/olimex/A20/linux-sunxi #HERE your kernel dir in example
+KDIR := /usr/src/linux-headers-3.13.0-65-generic/ #HERE your kernel dir in example
 PWD := $(shell pwd)
 
 obj-m += rootkitmod.o
