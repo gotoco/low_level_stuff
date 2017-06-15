@@ -5,3 +5,6 @@ Hope that You find here something usefull for Yourself.
 
 ## Content:
 * simplest_rootkit : funny example for hidding module, it do 3 things: hide itself, wait, running user-space process with root privileges
+* comunication_with_kernel : examples of most common ways to communicate between kernel and user space
+* mem_allocator : writing own memory allocator
+* vec_vs_ll : why you should never use linked list when you need performance
